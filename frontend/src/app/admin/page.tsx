@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Navbar from "@/components/Navbar";
 
 export default function AdminPage() {
     const router = useRouter();
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<{ username: string; role: string } | null>(null);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -37,9 +38,17 @@ export default function AdminPage() {
     }, []);
 
     return (
-        <div className="p-6">
-            <h1 className="text-3xl font-bold">Admin Panel</h1>
-            {user ? <p>Welcome, {user.username} (Admin)</p> : <p>Loading...</p>}
+        <div className="min-h-screen bg-gray-100 dark:bg-black">
+            {user && <Navbar user={user} />}
+
+            <div className="p-6">
+                <h1 className="text-3xl font-bold">Admin Panel</h1>
+                {user ? (
+                    <p>Welcome, {user.username} (Admin)</p>
+                ) : (
+                    <p>Loading...</p>
+                )}
+            </div>
         </div>
     );
 }
