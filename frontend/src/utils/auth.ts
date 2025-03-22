@@ -42,7 +42,7 @@ export const refreshAccessToken = async () => {
 /** ✅ Logout & redirect */
 export const logout = async () => {
     try {
-        await API.post("/auth/login", {}, { withCredentials: true });
+        await API.post("/auth/logout", {}, { withCredentials: true });
     } catch (error) {
         console.error("⚠️ Logout request failed");
     }

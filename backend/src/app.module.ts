@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller'; // ✅ Import the controller
+import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
+import { User } from './user/user.entity';
+import { UserController } from './user/user.controller';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(), // ✅ Enables .env support
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
@@ -15,9 +17,11 @@ import { AuthModule } from './auth/auth.module';
       password: process.env.DB_PASS || 'mekke187',
       database: process.env.DB_NAME || 'socio',
       autoLoadEntities: true,
-      synchronize: true,  // 🚨 Do NOT use in production
-    }), AuthModule,
+      synchronize: true,
+    }),
+    TypeOrmModule.forFeature([User]), // ✅ This solves the injection error
+    AuthModule,
   ],
-  controllers: [AppController], // ✅ Register the controller
+  controllers: [AppController, UserController],
 })
 export class AppModule { }

@@ -74,6 +74,8 @@ export class AuthController {
         try {
             const tokens = await this.authService.validateUser(body.username, body.password);
             console.log("✅ Login successful for:", body.username);
+            console.log("📟 Access Token (use this in curl/postman):");
+            console.log("Bearer " + tokens.accessToken);
 
             res.cookie("refreshToken", tokens.refreshToken, {
                 httpOnly: true,

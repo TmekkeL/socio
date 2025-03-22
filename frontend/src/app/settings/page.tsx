@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import Spinner from "@/components/Spinner";
 
 export default function SettingsPage() {
     const router = useRouter();
     const [darkMode, setDarkMode] = useState(false);
     const [user, setUser] = useState<{ username: string; role: string } | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -29,14 +31,17 @@ export default function SettingsPage() {
 
             const data = await res.json();
             setUser(data);
+            setLoading(false);
         };
 
         fetchUser();
     }, []);
 
+    if (loading) return <Spinner />;
+
     return (
         <div className={`min-h-screen ${darkMode ? "bg-black text-white" : "bg-gray-100 text-black"}`}>
-            {user && <Navbar user={user} />}
+            <Navbar user={user} />
 
             <div className="p-6">
                 <h1 className="text-3xl font-bold">Settings</h1>
