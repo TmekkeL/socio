@@ -1,5 +1,6 @@
+// Path: src/app/admin/users/page.tsx
 "use client";
-
+import React from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
@@ -44,21 +45,22 @@ export default function AdminUsersPage() {
                 return;
             }
 
-            await fetchAllUsers(token);
+            await fetchUsers();
             setLoading(false);
         };
 
         fetchCurrentUserAndUsers();
     }, []);
 
-    const fetchAllUsers = async (token: string) => {
-        const res = await fetch("http://localhost:3001/admin/users", {
+    const fetchUsers = async () => {
+        const token = localStorage.getItem("accessToken");
+        const resUsers = await fetch("http://localhost:3001/admin/users", {
             headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (res.ok) {
-            const data = await res.json();
-            setUsers(data);
+        if (resUsers.ok) {
+            const usersData = await resUsers.json();
+            setUsers(usersData);
         }
     };
 
@@ -73,7 +75,7 @@ export default function AdminUsersPage() {
         });
 
         if (res.ok) {
-            await fetchAllUsers(token);
+            await fetchUsers();
         }
     };
 
@@ -91,7 +93,7 @@ export default function AdminUsersPage() {
         });
 
         if (res.ok) {
-            await fetchAllUsers(token);
+            await fetchUsers();
         }
     };
 
@@ -109,7 +111,7 @@ export default function AdminUsersPage() {
         });
 
         if (res.ok) {
-            await fetchAllUsers(token);
+            await fetchUsers();
             setNewUser({ username: "", password: "" });
         }
     };

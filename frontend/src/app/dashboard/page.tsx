@@ -1,6 +1,7 @@
+// Path: src/app/dashboard/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Spinner from "@/components/Spinner";
@@ -14,20 +15,20 @@ export default function DashboardPage() {
         const fetchUser = async () => {
             const token = localStorage.getItem("accessToken");
             if (!token) {
+                setLoading(false); // ✅ Avoid spinner hanging
                 router.push("/login");
                 return;
             }
 
-            const start = performance.now(); // ⏱️ Start timer
-
+            const start = performance.now();
             const res = await fetch("http://localhost:3001/auth/me", {
                 headers: { Authorization: `Bearer ${token}` },
             });
-
-            const end = performance.now(); // ⏱️ End timer
+            const end = performance.now();
             console.log(`⏱️ /auth/me fetch took ${Math.round(end - start)}ms`);
 
             if (!res.ok) {
+                setLoading(false); // ✅ Still stop spinner on failed fetch
                 router.push("/login");
                 return;
             }
@@ -38,7 +39,7 @@ export default function DashboardPage() {
         };
 
         fetchUser();
-    }, []);
+    }, [router]);
 
     if (loading) return <Spinner />;
 

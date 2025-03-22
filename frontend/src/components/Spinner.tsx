@@ -1,5 +1,4 @@
-// src/components/Spinner.tsx
-"use client";
+import React from "react";
 
 const Spinner = () => {
     return (
