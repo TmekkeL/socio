@@ -1,16 +1,17 @@
-// Path: src/app/admin/users/page.tsx
 "use client";
-import React from "react";
-import { useEffect, useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Spinner from "@/components/Spinner";
+import { getToken } from "@/utils/auth";
 
 interface User {
     id: number;
     username: string;
     role: string;
-    createdAt: string;
+    created_at: string;
+    is_active?: boolean;
 }
 
 export default function AdminUsersPage() {
@@ -22,7 +23,7 @@ export default function AdminUsersPage() {
 
     useEffect(() => {
         const fetchCurrentUserAndUsers = async () => {
-            const token = localStorage.getItem("accessToken");
+            const token = getToken();
             if (!token) {
                 router.push("/login");
                 return;
@@ -50,37 +51,34 @@ export default function AdminUsersPage() {
         };
 
         fetchCurrentUserAndUsers();
-    }, []);
+    }, [router]);
 
     const fetchUsers = async () => {
-        const token = localStorage.getItem("accessToken");
-        const resUsers = await fetch("http://localhost:3001/admin/users", {
+        const token = getToken();
+        const res = await fetch("http://localhost:3001/admin/users", {
             headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (resUsers.ok) {
-            const usersData = await resUsers.json();
-            setUsers(usersData);
+        if (res.ok) {
+            const data = await res.json();
+            setUsers(data);
         }
     };
 
     const handleDelete = async (userId: number) => {
-        const confirmed = window.confirm("Are you sure you want to delete this user?");
-        if (!confirmed) return;
+        if (!confirm("Are you sure you want to delete this user?")) return;
 
-        const token = localStorage.getItem("accessToken");
+        const token = getToken();
         const res = await fetch(`http://localhost:3001/admin/users/${userId}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (res.ok) {
-            await fetchUsers();
-        }
+        if (res.ok) await fetchUsers();
     };
 
     const handleToggleRole = async (user: User) => {
-        const token = localStorage.getItem("accessToken");
+        const token = getToken();
         const newRole = user.role === "admin" ? "user" : "admin";
 
         const res = await fetch(`http://localhost:3001/admin/users/${user.id}`, {
@@ -92,22 +90,17 @@ export default function AdminUsersPage() {
             body: JSON.stringify({ role: newRole }),
         });
 
-        if (res.ok) {
-            await fetchUsers();
-        }
+        if (res.ok) await fetchUsers();
     };
 
     const handleAddUser = async () => {
         if (!newUser.username || !newUser.password) return;
-        const token = localStorage.getItem("accessToken");
 
         const res = await fetch("http://localhost:3001/auth/signup", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(newUser),
+            credentials: "include",
         });
 
         if (res.ok) {
@@ -121,9 +114,8 @@ export default function AdminUsersPage() {
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-black">
             <Navbar user={user} />
-
             <div className="p-6">
-                <h1 className="text-3xl font-bold mb-4">User Management</h1>
+                <h1 className="text-3xl font-bold mb-4" role="heading">User Management</h1>
 
                 {/* Add User Form */}
                 <div className="mb-6 flex gap-4">
@@ -156,7 +148,7 @@ export default function AdminUsersPage() {
                             <th className="p-2 text-left">ID</th>
                             <th className="p-2 text-left">Username</th>
                             <th className="p-2 text-left">Role</th>
-                            <th className="p-2 text-left">Created At</th>
+                            <th className="p-2 text-left">Created</th>
                             <th className="p-2 text-left">Actions</th>
                         </tr>
                     </thead>
@@ -166,7 +158,7 @@ export default function AdminUsersPage() {
                                 <td className="p-2">{u.id}</td>
                                 <td className="p-2">{u.username}</td>
                                 <td className="p-2">{u.role}</td>
-                                <td className="p-2">{new Date(u.createdAt).toLocaleString()}</td>
+                                <td className="p-2">{new Date(u.created_at).toLocaleString()}</td>
                                 <td className="p-2 space-x-2">
                                     <button
                                         onClick={() => handleToggleRole(u)}

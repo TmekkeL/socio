@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Spinner from "@/components/Spinner";
 import Link from "next/link";
+import { getToken, refreshAccessToken, storeToken } from "@/utils/auth";
 
 export default function AdminPage() {
     const router = useRouter();
@@ -13,7 +14,11 @@ export default function AdminPage() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const token = localStorage.getItem("accessToken");
+            let token = getToken();
+
+            if (!token) {
+                token = await refreshAccessToken(); // ✅ fallback using refresh cookie
+            }
 
             if (!token) {
                 router.push("/login");
@@ -30,17 +35,19 @@ export default function AdminPage() {
             }
 
             const data = await res.json();
+
             if (data.role !== "admin") {
                 router.push("/dashboard");
                 return;
             }
 
+            storeToken(token); // ✅ restore access token in memory
             setUser(data);
             setLoading(false);
         };
 
         fetchUser();
-    }, []);
+    }, [router]);
 
     if (loading) return <Spinner />;
 

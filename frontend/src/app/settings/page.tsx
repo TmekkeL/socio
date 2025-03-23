@@ -1,9 +1,10 @@
+// Path: src/app/settings/page.tsx
 "use client";
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Spinner from "@/components/Spinner";
+import { getToken, refreshAccessToken, storeToken } from "@/utils/auth";
 
 export default function SettingsPage() {
     const router = useRouter();
@@ -13,29 +14,40 @@ export default function SettingsPage() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const token = localStorage.getItem("accessToken");
+            let token = getToken();
 
+            // 🔄 Try to refresh if no token in memory
+            if (!token) {
+                token = await refreshAccessToken();
+            }
+
+            // ❌ Still no token? Redirect to login
             if (!token) {
                 router.push("/login");
                 return;
             }
 
-            const res = await fetch("http://localhost:3001/auth/me", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            try {
+                const res = await fetch("http://localhost:3001/auth/me", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
 
-            if (!res.ok) {
+                if (!res.ok) {
+                    throw new Error("Failed to fetch user");
+                }
+
+                const data = await res.json();
+                storeToken(token); // ✅ Re-store in memory after refresh
+                setUser(data);
+                setLoading(false);
+            } catch (error) {
+                console.error("⚠️ Failed to fetch /auth/me:", error);
                 router.push("/login");
-                return;
             }
-
-            const data = await res.json();
-            setUser(data);
-            setLoading(false);
         };
 
         fetchUser();
-    }, []);
+    }, [router]);
 
     if (loading) return <Spinner />;
 

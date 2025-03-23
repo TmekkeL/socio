@@ -1,7 +1,8 @@
 "use client";
-import React from "react"; // ✅ Add this!
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "@/utils/auth";
 
 interface NavbarProps {
     user: { username: string; role: string } | null;
@@ -35,18 +36,12 @@ export default function Navbar({ user }: NavbarProps) {
             </div>
 
             {user && (
-                <form action="/logout" method="POST">
-                    <button
-                        type="submit"
-                        className="text-red-500 hover:underline"
-                        onClick={() => {
-                            localStorage.removeItem("accessToken");
-                            window.location.href = "/login?loggedOut=true";
-                        }}
-                    >
-                        Logout
-                    </button>
-                </form>
+                <button
+                    onClick={logout}
+                    className="text-red-500 hover:underline"
+                >
+                    Logout
+                </button>
             )}
         </nav>
     );

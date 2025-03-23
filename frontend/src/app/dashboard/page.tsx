@@ -1,10 +1,10 @@
-// Path: src/app/dashboard/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Spinner from "@/components/Spinner";
+import { getToken } from "@/utils/auth"; // ✅ Use in-memory token
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -13,9 +13,9 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const token = localStorage.getItem("accessToken");
+            const token = getToken(); // ✅ In-memory token instead of localStorage
             if (!token) {
-                setLoading(false); // ✅ Avoid spinner hanging
+                setLoading(false);
                 router.push("/login");
                 return;
             }
@@ -28,7 +28,7 @@ export default function DashboardPage() {
             console.log(`⏱️ /auth/me fetch took ${Math.round(end - start)}ms`);
 
             if (!res.ok) {
-                setLoading(false); // ✅ Still stop spinner on failed fetch
+                setLoading(false);
                 router.push("/login");
                 return;
             }
@@ -46,7 +46,6 @@ export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-black">
             <Navbar user={user} />
-
             <div className="p-6">
                 <h1 className="text-3xl font-bold">Dashboard</h1>
                 <p>Welcome, {user?.username} ({user?.role})</p>

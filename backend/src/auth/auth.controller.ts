@@ -40,18 +40,18 @@ export class AuthController {
 
         try {
             const tokens = await this.authService.signup(body.username, body.password);
+            const { refreshToken, accessToken } = tokens;
             console.log("✅ Signup successful for:", body.username);
 
-            // ✅ Set secure HTTP-only cookie
-            res.cookie("refreshToken", tokens.refreshToken, {
+            res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
-                secure: true,
+                secure: false,
                 sameSite: "none",
-                domain: "localhost",
                 path: "/",
+                maxAge: 1000 * 60 * 60 * 24 * 7,
             });
 
-            return res.json({ accessToken: tokens.accessToken });
+            return res.json({ accessToken });
         } catch (error) {
             console.error("🚨 Signup failed:", error);
 
@@ -73,19 +73,20 @@ export class AuthController {
 
         try {
             const tokens = await this.authService.validateUser(body.username, body.password);
+            const { refreshToken, accessToken } = tokens;
             console.log("✅ Login successful for:", body.username);
             console.log("📟 Access Token (use this in curl/postman):");
-            console.log("Bearer " + tokens.accessToken);
+            console.log("Bearer " + accessToken);
 
-            res.cookie("refreshToken", tokens.refreshToken, {
+            res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
-                secure: true,
+                secure: false,
                 sameSite: "none",
-                domain: "localhost",
                 path: "/",
+                maxAge: 1000 * 60 * 60 * 24 * 7,
             });
 
-            return res.json({ accessToken: tokens.accessToken });
+            return res.json({ accessToken });
         } catch (error) {
             console.error("🚨 Login failed:", error);
 
@@ -130,22 +131,28 @@ export class AuthController {
         if (!refreshToken) throw new UnauthorizedException("Refresh token missing");
 
         const tokens = await this.authService.refreshToken(refreshToken);
+        const { accessToken, refreshToken: newRefreshToken, user } = tokens;
 
-        res.cookie("refreshToken", tokens.refreshToken, {
+        res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: "none",
             domain: "localhost",
             path: "/",
+            maxAge: 1000 * 60 * 60 * 24 * 7,
         });
 
-        return res.json({ accessToken: tokens.accessToken, user: tokens.user });
+        return res.json({ accessToken, user });
     }
 
     /** 🚪 Logout & clear refresh cookie */
     @Post("logout")
     async logout(@Res() res: Response) {
-        res.clearCookie("refreshToken", { path: "/", domain: "localhost" });
+        res.clearCookie("refreshToken", {
+            path: "/",
+            domain: "localhost",
+        });
+
         console.log("✅ User logged out, refresh token cleared!");
         return res.json({ message: "Logged out successfully" });
     }
