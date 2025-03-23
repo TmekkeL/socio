@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Spinner from "@/components/Spinner";
 import { getToken } from "@/utils/auth";
+import { UserIcon } from "lucide-react"; // Optional icon
 
 interface User {
     id: number;
@@ -24,27 +25,18 @@ export default function AdminUsersPage() {
     useEffect(() => {
         const fetchCurrentUserAndUsers = async () => {
             const token = getToken();
-            if (!token) {
-                router.push("/login");
-                return;
-            }
+            if (!token) return router.push("/login");
 
             const resMe = await fetch("http://localhost:3001/auth/me", {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            if (!resMe.ok) {
-                router.push("/login");
-                return;
-            }
+            if (!resMe.ok) return router.push("/login");
 
             const currentUser = await resMe.json();
             setUser(currentUser);
 
-            if (currentUser.role !== "admin") {
-                router.push("/dashboard");
-                return;
-            }
+            if (currentUser.role !== "admin") return router.push("/dashboard");
 
             await fetchUsers();
             setLoading(false);
@@ -59,10 +51,7 @@ export default function AdminUsersPage() {
             headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (res.ok) {
-            const data = await res.json();
-            setUsers(data);
-        }
+        if (res.ok) setUsers(await res.json());
     };
 
     const handleDelete = async (userId: number) => {
@@ -114,69 +103,79 @@ export default function AdminUsersPage() {
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-black">
             <Navbar user={user} />
-            <div className="p-6">
-                <h1 className="text-3xl font-bold mb-4" role="heading">User Management</h1>
+            <div className="p-6 space-y-6">
+                {/* Title */}
+                <div className="flex items-center gap-2">
+                    <UserIcon className="w-6 h-6 text-blue-600" />
+                    <h1 className="text-3xl font-bold">User Management</h1>
+                </div>
 
                 {/* Add User Form */}
-                <div className="mb-6 flex gap-4">
-                    <input
-                        type="text"
-                        placeholder="Username"
-                        value={newUser.username}
-                        onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-                        className="border p-2 rounded"
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={newUser.password}
-                        onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                        className="border p-2 rounded"
-                    />
-                    <button
-                        onClick={handleAddUser}
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                    >
-                        Add User
-                    </button>
+                <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-md space-y-4">
+                    <h2 className="text-xl font-semibold">Add New User</h2>
+                    <div className="flex flex-wrap gap-4">
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={newUser.username}
+                            onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                            className="border p-2 rounded w-full sm:w-auto flex-1"
+                        />
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={newUser.password}
+                            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                            className="border p-2 rounded w-full sm:w-auto flex-1"
+                        />
+                        <button
+                            onClick={handleAddUser}
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        >
+                            Add User
+                        </button>
+                    </div>
                 </div>
 
                 {/* Users Table */}
-                <table className="w-full border border-gray-300 dark:border-gray-700">
-                    <thead>
-                        <tr className="bg-gray-200 dark:bg-gray-800">
-                            <th className="p-2 text-left">ID</th>
-                            <th className="p-2 text-left">Username</th>
-                            <th className="p-2 text-left">Role</th>
-                            <th className="p-2 text-left">Created</th>
-                            <th className="p-2 text-left">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map((u) => (
-                            <tr key={u.id} className="border-t border-gray-300 dark:border-gray-700">
-                                <td className="p-2">{u.id}</td>
-                                <td className="p-2">{u.username}</td>
-                                <td className="p-2">{u.role}</td>
-                                <td className="p-2">{new Date(u.created_at).toLocaleString()}</td>
-                                <td className="p-2 space-x-2">
-                                    <button
-                                        onClick={() => handleToggleRole(u)}
-                                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                                    >
-                                        Toggle Role
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(u.id)}
-                                        className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
+                <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-md">
+                    <h2 className="text-xl font-semibold mb-4">All Users</h2>
+                    <table className="w-full border border-gray-300 dark:border-gray-700">
+                        <thead>
+                            <tr className="bg-gray-200 dark:bg-gray-800">
+                                <th className="p-2 text-left">ID</th>
+                                <th className="p-2 text-left">Username</th>
+                                <th className="p-2 text-left">Role</th>
+                                <th className="p-2 text-left">Created</th>
+                                <th className="p-2 text-left">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {users.map((u) => (
+                                <tr key={u.id} className="border-t border-gray-300 dark:border-gray-700">
+                                    <td className="p-2">{u.id}</td>
+                                    <td className="p-2">{u.username}</td>
+                                    <td className="p-2 capitalize">{u.role}</td>
+                                    <td className="p-2">{new Date(u.created_at).toLocaleString()}</td>
+                                    <td className="p-2 space-x-2">
+                                        <button
+                                            onClick={() => handleToggleRole(u)}
+                                            className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                                        >
+                                            Toggle Role
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(u.id)}
+                                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

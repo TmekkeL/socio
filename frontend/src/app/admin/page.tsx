@@ -17,7 +17,7 @@ export default function AdminPage() {
             let token = getToken();
 
             if (!token) {
-                token = await refreshAccessToken(); // ✅ fallback using refresh cookie
+                token = await refreshAccessToken();
             }
 
             if (!token) {
@@ -41,7 +41,7 @@ export default function AdminPage() {
                 return;
             }
 
-            storeToken(token); // ✅ restore access token in memory
+            storeToken(token);
             setUser(data);
             setLoading(false);
         };
@@ -55,17 +55,32 @@ export default function AdminPage() {
         <div className="min-h-screen bg-gray-100 dark:bg-black">
             <Navbar user={user} />
 
-            <div className="p-6">
-                <h1 className="text-3xl font-bold mb-4">Admin Panel</h1>
-                <p>Welcome, {user?.username} (Admin)</p>
+            <div className="max-w-4xl mx-auto mt-10 bg-white dark:bg-gray-900 shadow-lg rounded-xl p-6 space-y-6">
+                <h1 className="text-3xl font-bold text-center">🧑‍💻 Admin Panel</h1>
+                <p className="text-center text-gray-700 dark:text-gray-300">
+                    Welcome, <span className="font-semibold">{user?.username}</span> (admin)
+                </p>
 
-                <div className="mt-6">
+                <div className="bg-gray-100 dark:bg-gray-800 rounded-md p-4">
+                    <h2 className="text-xl font-semibold mb-2">Admin Tools</h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                        Use the tools below to manage users and monitor the system.
+                    </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
                     <Link
                         href="/admin/users"
-                        className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                        className="w-full text-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition"
                     >
-                        ➕ Manage Users
+                        👥 Manage Users
                     </Link>
+                    <button
+                        disabled
+                        className="w-full text-center py-2 px-4 bg-gray-300 dark:bg-gray-700 text-black dark:text-white rounded-md cursor-not-allowed"
+                    >
+                        ⚙️ System Logs (Coming Soon)
+                    </button>
                 </div>
             </div>
         </div>
