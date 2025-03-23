@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Spinner from "@/components/Spinner";
 import { getToken } from "@/utils/auth";
-import { UserIcon } from "lucide-react"; // Optional icon
+import { UserIcon } from "lucide-react";
 
 interface User {
     id: number;
@@ -21,6 +21,9 @@ export default function AdminUsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [newUser, setNewUser] = useState({ username: "", password: "" });
+
+    const [editingUser, setEditingUser] = useState<User | null>(null); // ✅
+    const [isModalOpen, setIsModalOpen] = useState(false); // ✅
 
     useEffect(() => {
         const fetchCurrentUserAndUsers = async () => {
@@ -98,19 +101,28 @@ export default function AdminUsersPage() {
         }
     };
 
+    const openEditModal = (user: User) => {
+        setEditingUser(user);
+        setIsModalOpen(true);
+    };
+
+    const closeEditModal = () => {
+        setEditingUser(null);
+        setIsModalOpen(false);
+    };
+
     if (loading) return <Spinner />;
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-black">
             <Navbar user={user} />
             <div className="p-6 space-y-6">
-                {/* Title */}
                 <div className="flex items-center gap-2">
                     <UserIcon className="w-6 h-6 text-blue-600" />
                     <h1 className="text-3xl font-bold">User Management</h1>
                 </div>
 
-                {/* Add User Form */}
+                {/* Add User */}
                 <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-md space-y-4">
                     <h2 className="text-xl font-semibold">Add New User</h2>
                     <div className="flex flex-wrap gap-4">
@@ -170,6 +182,12 @@ export default function AdminUsersPage() {
                                         >
                                             Delete
                                         </button>
+                                        <button
+                                            onClick={() => openEditModal(u)}
+                                            className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
+                                        >
+                                            Edit
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -177,6 +195,62 @@ export default function AdminUsersPage() {
                     </table>
                 </div>
             </div>
+
+            {/* Edit User Modal */}
+            {isModalOpen && editingUser && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 w-full max-w-md space-y-4">
+                        <h2 className="text-xl font-bold text-center">Edit User</h2>
+
+                        <input
+                            type="text"
+                            value={editingUser.username}
+                            disabled
+                            className="w-full border rounded px-4 py-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+                        />
+
+                        <select
+                            value={editingUser.role}
+                            onChange={(e) =>
+                                setEditingUser({ ...editingUser, role: e.target.value })
+                            }
+                            className="w-full border rounded px-4 py-2"
+                        >
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+
+                        <div className="flex justify-end gap-2 pt-2">
+                            <button
+                                onClick={closeEditModal}
+                                className="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500 text-white"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    const token = getToken();
+                                    const res = await fetch(`http://localhost:3001/admin/users/${editingUser.id}`, {
+                                        method: "PUT",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            Authorization: `Bearer ${token}`,
+                                        },
+                                        body: JSON.stringify({ role: editingUser.role }),
+                                    });
+                                    if (res.ok) {
+                                        await fetchUsers();
+                                        closeEditModal();
+                                    }
+                                }}
+                                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

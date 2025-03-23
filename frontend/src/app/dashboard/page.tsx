@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Spinner from "@/components/Spinner";
-import { getToken } from "@/utils/auth";
+import { getToken, storeToken, refreshAccessToken } from "@/utils/auth";
+import { secureFetch } from "@/utils/secureFetch"; // ✅ use secureFetch
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -13,27 +14,29 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const token = getToken();
+            let token = getToken();
+
             if (!token) {
-                setLoading(false);
+                token = await refreshAccessToken(); // 🔄 try to refresh first
+            }
+
+            if (!token) {
                 router.push("/login");
                 return;
             }
 
             const start = performance.now();
-            const res = await fetch("http://localhost:3001/auth/me", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const res = await secureFetch("http://localhost:3001/auth/me");
             const end = performance.now();
             console.log(`⏱️ /auth/me fetch took ${Math.round(end - start)}ms`);
 
-            if (!res.ok) {
-                setLoading(false);
-                router.push("/login");
+            if (res.status === 401) {
+                router.push("/login?loggedOut=true");
                 return;
             }
 
             const data = await res.json();
+            storeToken(token); // ✅ restore access token in memory
             setUser(data);
             setLoading(false);
         };

@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Spinner from "@/components/Spinner";
 import Link from "next/link";
 import { getToken, refreshAccessToken, storeToken } from "@/utils/auth";
+import { secureFetch } from "@/utils/secureFetch"; // ✅ Add this
 
 export default function AdminPage() {
     const router = useRouter();
@@ -25,12 +26,10 @@ export default function AdminPage() {
                 return;
             }
 
-            const res = await fetch("http://localhost:3001/auth/me", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const res = await secureFetch("http://localhost:3001/auth/me");
 
-            if (!res.ok) {
-                router.push("/login");
+            if (res.status === 401) {
+                router.push("/login?loggedOut=true");
                 return;
             }
 
@@ -48,6 +47,7 @@ export default function AdminPage() {
 
         fetchUser();
     }, [router]);
+
 
     if (loading) return <Spinner />;
 
