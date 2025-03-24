@@ -6,12 +6,15 @@ import Navbar from "@/components/Navbar";
 import Spinner from "@/components/Spinner";
 import { getToken } from "@/utils/auth";
 import { UserIcon } from "lucide-react";
+import EditUserModal from "@/components/EditUserModal";
+import toast from "react-hot-toast";
 
 interface User {
     id: number;
     username: string;
     role: string;
-    created_at: string;
+    createdAt?: string;
+    updatedAt?: string;
     is_active?: boolean;
 }
 
@@ -21,9 +24,7 @@ export default function AdminUsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [newUser, setNewUser] = useState({ username: "", password: "" });
-
-    const [editingUser, setEditingUser] = useState<User | null>(null); // ✅
-    const [isModalOpen, setIsModalOpen] = useState(false); // ✅
+    const [editingUser, setEditingUser] = useState<User | null>(null);
 
     useEffect(() => {
         const fetchCurrentUserAndUsers = async () => {
@@ -66,7 +67,10 @@ export default function AdminUsersPage() {
             headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (res.ok) await fetchUsers();
+        if (res.ok) {
+            await fetchUsers();
+            toast.success("User deleted ✅");
+        }
     };
 
     const handleToggleRole = async (user: User) => {
@@ -82,7 +86,10 @@ export default function AdminUsersPage() {
             body: JSON.stringify({ role: newRole }),
         });
 
-        if (res.ok) await fetchUsers();
+        if (res.ok) {
+            await fetchUsers();
+            toast.success("Role updated ✅");
+        }
     };
 
     const handleAddUser = async () => {
@@ -98,17 +105,8 @@ export default function AdminUsersPage() {
         if (res.ok) {
             await fetchUsers();
             setNewUser({ username: "", password: "" });
+            toast.success("User added ✅");
         }
-    };
-
-    const openEditModal = (user: User) => {
-        setEditingUser(user);
-        setIsModalOpen(true);
-    };
-
-    const closeEditModal = () => {
-        setEditingUser(null);
-        setIsModalOpen(false);
     };
 
     if (loading) return <Spinner />;
@@ -152,13 +150,14 @@ export default function AdminUsersPage() {
                 {/* Users Table */}
                 <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-md">
                     <h2 className="text-xl font-semibold mb-4">All Users</h2>
-                    <table className="w-full border border-gray-300 dark:border-gray-700">
+                    <table className="w-full border border-gray-300 dark:border-gray-700 text-sm">
                         <thead>
                             <tr className="bg-gray-200 dark:bg-gray-800">
                                 <th className="p-2 text-left">ID</th>
                                 <th className="p-2 text-left">Username</th>
                                 <th className="p-2 text-left">Role</th>
                                 <th className="p-2 text-left">Created</th>
+                                <th className="p-2 text-left">Updated</th>
                                 <th className="p-2 text-left">Actions</th>
                             </tr>
                         </thead>
@@ -168,7 +167,16 @@ export default function AdminUsersPage() {
                                     <td className="p-2">{u.id}</td>
                                     <td className="p-2">{u.username}</td>
                                     <td className="p-2 capitalize">{u.role}</td>
-                                    <td className="p-2">{new Date(u.created_at).toLocaleString()}</td>
+                                    <td className="p-2">
+                                        {u.createdAt
+                                            ? new Date(u.createdAt).toLocaleString()
+                                            : "—"}
+                                    </td>
+                                    <td className="p-2 text-gray-500">
+                                        {u.updatedAt
+                                            ? new Date(u.updatedAt).toLocaleString()
+                                            : "—"}
+                                    </td>
                                     <td className="p-2 space-x-2">
                                         <button
                                             onClick={() => handleToggleRole(u)}
@@ -183,7 +191,7 @@ export default function AdminUsersPage() {
                                             Delete
                                         </button>
                                         <button
-                                            onClick={() => openEditModal(u)}
+                                            onClick={() => setEditingUser(u)}
                                             className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
                                         >
                                             Edit
@@ -196,60 +204,16 @@ export default function AdminUsersPage() {
                 </div>
             </div>
 
-            {/* Edit User Modal */}
-            {isModalOpen && editingUser && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 w-full max-w-md space-y-4">
-                        <h2 className="text-xl font-bold text-center">Edit User</h2>
-
-                        <input
-                            type="text"
-                            value={editingUser.username}
-                            disabled
-                            className="w-full border rounded px-4 py-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
-                        />
-
-                        <select
-                            value={editingUser.role}
-                            onChange={(e) =>
-                                setEditingUser({ ...editingUser, role: e.target.value })
-                            }
-                            className="w-full border rounded px-4 py-2"
-                        >
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                        </select>
-
-                        <div className="flex justify-end gap-2 pt-2">
-                            <button
-                                onClick={closeEditModal}
-                                className="px-4 py-2 rounded bg-gray-400 hover:bg-gray-500 text-white"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={async () => {
-                                    const token = getToken();
-                                    const res = await fetch(`http://localhost:3001/admin/users/${editingUser.id}`, {
-                                        method: "PUT",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                            Authorization: `Bearer ${token}`,
-                                        },
-                                        body: JSON.stringify({ role: editingUser.role }),
-                                    });
-                                    if (res.ok) {
-                                        await fetchUsers();
-                                        closeEditModal();
-                                    }
-                                }}
-                                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                                Save
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {editingUser && (
+                <EditUserModal
+                    user={editingUser}
+                    onClose={() => setEditingUser(null)}
+                    onSaved={async () => {
+                        await fetchUsers();
+                        toast.success("User updated ✅");
+                        setEditingUser(null);
+                    }}
+                />
             )}
         </div>
     );

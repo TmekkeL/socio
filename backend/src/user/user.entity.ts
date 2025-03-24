@@ -7,7 +7,7 @@ import {
     UpdateDateColumn,
 } from "typeorm";
 
-@Entity("users") // Match actual table name in Postgres
+@Entity("users") // Matches actual table name in Postgres
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
@@ -21,10 +21,18 @@ export class User {
     @Column({ default: "user" })
     role: string;
 
-    @CreateDateColumn({ name: "created_at" })
+    @CreateDateColumn({
+        name: "created_at",
+        type: "timestamp with time zone",
+        default: () => "now()",
+    })
     createdAt: Date;
 
-    @UpdateDateColumn({ name: "updated_at" })
+    @UpdateDateColumn({
+        name: "updated_at",
+        type: "timestamp with time zone",
+        default: () => "now()",
+    })
     updatedAt: Date;
 
     @Column({ name: "is_active", default: true })

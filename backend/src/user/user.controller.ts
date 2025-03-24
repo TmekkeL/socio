@@ -2,6 +2,7 @@ import {
     Controller,
     Get,
     Put,
+    Patch,
     Delete,
     Param,
     Body,
@@ -37,7 +38,7 @@ export class UserController {
         }
 
         const users = await this.userRepository.find({
-            select: ["id", "username", "role", "createdAt"],
+            select: ["id", "username", "role", "createdAt", "updatedAt"],
             order: { id: "ASC" },
         });
 
@@ -67,6 +68,31 @@ export class UserController {
         await this.userRepository.save(user);
 
         return { message: "User updated successfully", user };
+    }
+
+    @Patch("users/:id")
+    @UseGuards(AuthGuard("jwt"))
+    async partiallyUpdateUser(
+        @Param("id") id: number,
+        @Body() updateData: Partial<User>,
+        @Req() req: AuthRequest
+    ) {
+        const requester = req.user;
+        if (requester?.role !== "admin") {
+            throw new ForbiddenException("Access denied");
+        }
+
+        const user = await this.userRepository.findOne({ where: { id } });
+        if (!user) {
+            throw new NotFoundException("User not found");
+        }
+
+        Object.assign(user, updateData);
+        user.updatedAt = new Date();
+
+        await this.userRepository.save(user);
+
+        return { message: "User partially updated", user };
     }
 
     @Delete("users/:id")

@@ -17,7 +17,7 @@ export default function EditUserModal({ user, onClose, onSaved }: Props) {
     const handleSave = async () => {
         const token = getToken();
         const res = await fetch(`http://localhost:3001/admin/users/${user.id}`, {
-            method: "PUT",
+            method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,

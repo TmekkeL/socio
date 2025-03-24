@@ -77,7 +77,7 @@ export default function SettingsPage() {
                     <div className="pt-2">
                         <button
                             onClick={() => setDarkMode(!darkMode)}
-                            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition"
+                            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-200 hover:scale-101"
                         >
                             {darkMode ? "🌞 Switch to Light Mode" : "🌙 Switch to Dark Mode"}
                         </button>
