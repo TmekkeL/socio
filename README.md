@@ -26,7 +26,7 @@ Edit
 
 ### 🔧 Backend
 
-```bash
+## ```bash
 cd backend
 cp .env.example .env
 npm install
@@ -82,8 +82,7 @@ This boilerplate is designed to evolve — you can:
 📄 License
 MIT — do what you want, just don’t sell it as-is without love.
 
-
 What started as a project with ambitious goals made me realize there were already existing solutions out there.
 That’s why I chose to focus on building a solid, reusable foundation — a core piece that I can adapt and build on for future projects.
-This was my fourth attempt for this project, started somewhere around 20th of Januari 2025 with the first attempt, and the fourth attempt(start: 20th of March) has been build in less than 40 hours hours(25th of March). 
-
+This was my fourth attempt for this project, started somewhere around 20th of Januari 2025 with the first attempt. 
+The fourth attempt(start: 20th of March) has been build in less than 40 hours hours(25th of March). 
