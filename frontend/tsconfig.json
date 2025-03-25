@@ -17,16 +17,17 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "baseUrl": "./src", // ✅ now points to /frontend/src
+    "paths": {
+      "@/*": [
+        "./*"
+      ] // ✅ resolves @/ to /frontend/src/*
+    },
     "plugins": [
       {
         "name": "next"
       }
-    ],
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+    ]
   },
   "include": [
     "next-env.d.ts",

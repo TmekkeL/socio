@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧠 Frontend – Socio Vault Boilerplate
 
-## Getting Started
+This is the frontend of the **Login module** project — built with **Next.js App Router**, **Tailwind CSS**, and reusable components.
 
-First, run the development server:
+The goal is to serve as a **clean boilerplate** for authentication-based apps with partly or whatever:
+- Email/password login  
+- Token management (access + refresh)  
+- Role-based routing (admin/user)  
+- Dark mode  
+- Loading states, toasts & clean UI  
+- Easy cloning & B2C extension
+
+---
+
+## ⚙️ 1. Getting Started
+
+### 🧪 Install dependencies
 
 ```bash
+cd frontend
+npm install
+Optional: Use pnpm if you prefer
+
+🚀 Run dev server
+bash
+Copy
+Edit
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Starts the app on http://localhost:3000
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+⚠️ Environment Variables
+Create a .env.local file using the example:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+bash
+Copy
+Edit
+cp .env.example .env.local
+Example contents:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+env
+Copy
+Edit
+NEXT_PUBLIC_API_URL=http://localhost:3001
+This is where the frontend fetches /auth/me, /login, etc. from the backend.
 
-## Learn More
+🧩 2. Project Structure
+bash
+Copy
+Edit
+src/
+├── app/              # Pages & routes (Next.js App Router)
+│   └── login/        # Example: /login page
+├── components/       # Reusable UI components (Navbar, Spinner, etc.)
+├── hooks/            # Custom React hooks (like useAuth)
+├── utils/            # Utility functions (auth.ts, token logic)
+├── styles/           # Tailwind CSS or global styles
+🔁 3. Path Aliases (@/)
+To avoid ../../../utils/auth, we use @/ as a shortcut to src/.
 
-To learn more about Next.js, take a look at the following resources:
+✅ Example:
+ts
+Copy
+Edit
+import { storeToken } from "@/utils/auth";
+import Navbar from "@/components/Navbar";
+import { useAuth } from "@/hooks/useAuth";
+🔧 Configured in tsconfig.json:
+json
+Copy
+Edit
+{
+  "baseUrl": "./src",
+  "paths": {
+    "@/*": ["./*"]
+  }
+}
+After editing this, always restart the dev server.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+🌐 4. Tech Stack & Libraries
+Tech	Purpose
+Next.js	App Router structure
+Tailwind CSS	Styling (dark/light support)
+react-hot-toast	Feedback toasts
+Cypress	E2E testing (planned)
+TypeScript	Strong typing
+JWT	Auth flow (via backend API)
+✅ 5. Available Scripts
+bash
+Copy
+Edit
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run lint         # Run ESLint
+npm run cypress      # Launch Cypress test runner (if configured)
+🧪 6. Testing
+Unit & render tests live in __tests__/.
+E2E tests (Cypress) will live in cypress/ once implemented.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To run tests:
 
-## Deploy on Vercel
+bash
+Copy
+Edit
+npm run test
+💡 Developer Tips
+Restart dev server after editing tsconfig.json
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+If @/ alias doesn't work, make sure you're importing from inside src/
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Use Spinner or toast messages for feedback on all API interactions
+
+Reuse useAuth() hook to centralize token logic
+
+Dark mode toggle is available on /settings
+
+📦 Ready to Clone

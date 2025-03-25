@@ -6,9 +6,9 @@ services:
     container_name: socio-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: mekke187
-      POSTGRES_PASSWORD: securepassword
-      POSTGRES_DB: socio
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+      POSTGRES_DB: $DB_NAME
     ports:
       - "5432:5432"
     volumes:

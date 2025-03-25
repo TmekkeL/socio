@@ -53,37 +53,35 @@ export default function SettingsPage() {
         <div className={`${darkMode ? "bg-black text-white" : "bg-gray-100 text-black"} min-h-screen`}>
             <Navbar user={user} />
 
-            <div className="max-w-3xl mx-auto mt-10 bg-white dark:bg-gray-900 shadow-lg rounded-xl p-6 space-y-6">
-                <h1 className="text-3xl font-bold text-center">🛠 Settings</h1>
-                <p className="text-center text-gray-700 dark:text-gray-300">
-                    Manage your preferences and account settings below.
-                </p>
+            <main className="max-w-3xl mx-auto mt-10 p-6">
+                <div className="bg-white dark:bg-gray-900 shadow-md rounded-xl p-6 space-y-6">
+                    <h1 className="text-3xl font-bold text-center">🛠 Settings</h1>
+                    <p className="text-center text-gray-700 dark:text-gray-300">
+                        Manage your preferences and account settings below.
+                    </p>
 
-                <div className="space-y-4">
-                    <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
-                        <p className="font-semibold text-gray-800 dark:text-white">
-                            Username:
-                        </p>
-                        <p className="text-gray-600 dark:text-gray-300">{user?.username}</p>
-                    </div>
+                    <section className="space-y-4">
+                        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
+                            <p className="font-semibold text-gray-800 dark:text-white">Username:</p>
+                            <p className="text-gray-600 dark:text-gray-300">{user?.username}</p>
+                        </div>
 
-                    <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
-                        <p className="font-semibold text-gray-800 dark:text-white">
-                            Role:
-                        </p>
-                        <p className="text-gray-600 dark:text-gray-300 uppercase">{user?.role}</p>
-                    </div>
+                        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md">
+                            <p className="font-semibold text-gray-800 dark:text-white">Role:</p>
+                            <p className="text-gray-600 dark:text-gray-300 uppercase">{user?.role}</p>
+                        </div>
 
-                    <div className="pt-2">
-                        <button
-                            onClick={() => setDarkMode(!darkMode)}
-                            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-200 hover:scale-101"
-                        >
-                            {darkMode ? "🌞 Switch to Light Mode" : "🌙 Switch to Dark Mode"}
-                        </button>
-                    </div>
+                        <div className="pt-2">
+                            <button
+                                onClick={() => setDarkMode(!darkMode)}
+                                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-200 hover:scale-101"
+                            >
+                                {darkMode ? "🌞 Switch to Light Mode" : "🌙 Switch to Dark Mode"}
+                            </button>
+                        </div>
+                    </section>
                 </div>
-            </div>
+            </main>
         </div>
     );
 }
