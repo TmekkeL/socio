@@ -75,9 +75,9 @@ This boilerplate is designed to evolve — you can:
 
 🔁 Clone it for new secure apps
 
-🧪 Extend it with Cypress E2E tests
+🧪 Extend it with Cypress E2E tests(still has some work left)
 
-🧑‍💼 Fork it into a MS Entra B2C login system
+🧑‍💼 Fork it into a MS Entra B2C login system(is what i am going to do next)
 
 📄 License
 MIT — do what you want, just don’t sell it as-is without love.
@@ -85,4 +85,4 @@ MIT — do what you want, just don’t sell it as-is without love.
 What started as a project with ambitious goals made me realize there were already existing solutions out there.
 That’s why I chose to focus on building a solid, reusable foundation — a core piece that I can adapt and build on for future projects.
 This was my fourth attempt for this project, started somewhere around 20th of Januari 2025 with the first attempt. 
-The fourth attempt(start: 20th of March) has been build in less than 40 hours hours(25th of March). 
+The fourth attempt(start: 20th of March) has been build in less than 40 hours(25th of March). 
