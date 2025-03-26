@@ -1,4 +1,4 @@
-# 🧠 Frontend – Socio Vault Boilerplate
+# 🧠 Frontend – Boilerplate
 
 This is the frontend of the **Login module** project — built with **Next.js App Router**, **Tailwind CSS**, and reusable components.
 
